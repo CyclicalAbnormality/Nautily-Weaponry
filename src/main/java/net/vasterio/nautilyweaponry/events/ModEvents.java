@@ -22,6 +22,7 @@ import java.util.UUID;
 @EventBusSubscriber(modid = NautilyWeaponry.MOD_ID)
 public class ModEvents {
 
+    //this needs a little reworked to also consider the case where there is damage stored in FOF
     @SubscribeEvent
     public static void onPlayerAttackFOF(AttackEntityEvent Event){
         //find the player that attacks
@@ -127,6 +128,7 @@ public class ModEvents {
                             FirthOfFifthsData updated = new FirthOfFifthsData(
                                     0,
                                     Optional.empty(),
+                                    //this line actually doesn't make sense, the damage only resets when it hits something not when the timer runs out
                                     0.0f,
                                     0L,
                                     data.CoolDownEndTick()
