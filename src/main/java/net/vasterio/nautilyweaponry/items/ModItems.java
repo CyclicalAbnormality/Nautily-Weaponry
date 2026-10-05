@@ -20,7 +20,9 @@ public class ModItems {
             "firth_of_fifths",
             () -> new FirthOfFifthsItems(
                     Tiers.DIAMOND,
-                    new Item.Properties().component(ModDataComponents.FIRTH_DATA.get(), new FirthOfFifthsData(0, Optional.empty(), 0.0f, 0L, 0L)).attributes(SwordItem.createAttributes(Tiers.DIAMOND, 0, -2.4F))
+                    new Item.Properties()
+                            .component(ModDataComponents.FIRTH_DATA.get(), new FirthOfFifthsData(0, Optional.empty(), 0.0f, 0L, 0L, false))
+                            .attributes(SwordItem.createAttributes(Tiers.DIAMOND, -4.0F, -2.4F))
             )
     );
 

@@ -13,7 +13,8 @@ public record FirthOfFifthsData(
         Optional<UUID> targetedplayer,
         float totaldmg,
         long TimeLeft,
-        long CoolDownEndTick
+        long CoolDownEndTick,
+        boolean isUpgraded
 ) {
     public static final Codec<FirthOfFifthsData> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -21,6 +22,7 @@ public record FirthOfFifthsData(
                     UUIDUtil.CODEC.optionalFieldOf("targetedplayer").forGetter(FirthOfFifthsData::targetedplayer),
                     Codec.FLOAT.fieldOf("totaldmg").forGetter(FirthOfFifthsData::totaldmg),
                     Codec.LONG.fieldOf("TimeLeft").forGetter(FirthOfFifthsData::TimeLeft),
-                    Codec.LONG.fieldOf("CoolDownEndTick").forGetter(FirthOfFifthsData::CoolDownEndTick)
+                    Codec.LONG.fieldOf("CoolDownEndTick").forGetter(FirthOfFifthsData::CoolDownEndTick),
+                    Codec.BOOL.fieldOf("isUpgraded").forGetter(FirthOfFifthsData::isUpgraded)
             ).apply(instance, FirthOfFifthsData::new));
 }

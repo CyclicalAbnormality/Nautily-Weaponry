@@ -31,7 +31,7 @@ public class FirthOfFifthsItems extends SwordItem {
     public FirthOfFifthsData getData(ItemStack stack){
         return stack.getOrDefault(
                 ModDataComponents.FIRTH_DATA.get(),
-                new FirthOfFifthsData(0, Optional.empty(), 0.0f, 0, 0));
+                new FirthOfFifthsData(0, Optional.empty(), 0.0f, 0, 0, false));
     }
 
     public float getTotalDMG(ItemStack stack){
@@ -46,7 +46,8 @@ public class FirthOfFifthsItems extends SwordItem {
                 current.targetedplayer(),
                 DMG,
                 current.TimeLeft(),
-                current.CoolDownEndTick()
+                current.CoolDownEndTick(),
+                current.isUpgraded()
         );
 
         stack.set(ModDataComponents.FIRTH_DATA.get(), updated);
