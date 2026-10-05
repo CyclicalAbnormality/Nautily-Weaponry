@@ -32,31 +32,55 @@ public class ModEvents {
             return;
         }
         //check if the player's main-hand item is FOF
-        if (player.getMainHandItem().getItem() instanceof FirthOfFifthsItems fofItems){
+        if (player.getMainHandItem().getItem() instanceof FirthOfFifthsItems FOF){
             //check if FOF's MODE is set to 1
-            if (fofItems.getData(player.getMainHandItem()).MODE() == 1){
+            if (FOF.getData(player.getMainHandItem()).MODE() == 1){
                 //check if there's currently no targeted player in the FOF
-                if (fofItems.getData(player.getMainHandItem()).targetedplayer().isEmpty()){
-                    //set the timer
-                    long expireTick = player.level().getGameTime() + 600L;
-                    //put the UUID of the entity that is attacked into target slot
-                    FirthOfFifthsData current = fofItems.getData(player.getMainHandItem());
-                    FirthOfFifthsData updated = new FirthOfFifthsData(
-                            current.MODE(),
-                            Optional.of(Event.getTarget().getUUID()),
-                            current.totaldmg(),
-                            expireTick,
-                            current.CoolDownEndTick()
-                    );
-                    //update
-                    player.getMainHandItem().set(ModDataComponents.FIRTH_DATA.get(), updated);
-                    //apply potion effects
-                    if (Event.getTarget() instanceof LivingEntity LivingEntity){
-                        LivingEntity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 600, 0, false, true));
+                if (FOF.getData(player.getMainHandItem()).targetedplayer().isEmpty()){
+                    //check if recorded damage = 0 or not
+                    if (FOF.getData(player.getMainHandItem()).totaldmg() == 0.0f){
+                        //set the timer
+                        long timeLeft = player.level().getGameTime() + 600L;
+                        //put the UUID of the entity that is attacked into target slot
+                        FirthOfFifthsData current = FOF.getData(player.getMainHandItem());
+                        FirthOfFifthsData updated = new FirthOfFifthsData(
+                                current.MODE(),
+                                Optional.of(Event.getTarget().getUUID()),
+                                current.totaldmg(),
+                                timeLeft,
+                                current.CoolDownEndTick()
+                        );
+                        //update
+                        player.getMainHandItem().set(ModDataComponents.FIRTH_DATA.get(), updated);
+                        //apply potion effects
+                        if (Event.getTarget() instanceof LivingEntity LivingEntity){
+                            LivingEntity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 600, 0, false, true));
+                        }
+                        //cancel the attacking result
+                        Event.setCanceled(true);
+                        return;
                     }
-                    //cancel the attacking result
-                    Event.setCanceled(true);
-                    return;
+                    //if the recorded damage is more than 0, do the following:
+                    else {
+                        long timeLeft = player.level().getGameTime() + 600L;
+                        long coolDown = player.level().getGameTime() + 1200L;
+                        //if the timer is still on (item is still activated), cancel the event
+                        if (player.level().getGameTime() <= timeLeft){
+                            Event.setCanceled(true);
+                            return;
+                        }
+                        //in case 'record' is not activated
+                        FirthOfFifthsData current = FOF.getData(player.getMainHandItem());
+                        FirthOfFifthsData updated = new FirthOfFifthsData(
+                                0,
+                                Optional.empty(),
+                                0.0f,
+                                0L,
+                                coolDown
+                        );
+                        //update the shit
+                        player.getMainHandItem().set(ModDataComponents.FIRTH_DATA.get(), updated);
+                    }
                 }
                 return;
             }
