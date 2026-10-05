@@ -25,7 +25,7 @@ public class ModEvents {
 
     //might also need to check for CoolDown here
     @SubscribeEvent
-    public static void onPlayerAttackFOF(AttackEntityEvent Event){
+    public static void onPlayerAttackFOF_ForRecord(AttackEntityEvent Event){
         //find the player that attacks
         Player player = Event.getEntity();
         //check if the action is done on the server side
@@ -36,9 +36,11 @@ public class ModEvents {
         if (player.getMainHandItem().getItem() instanceof FirthOfFifthsItems FOF){
             FirthOfFifthsData data = FOF.getData(player.getMainHandItem());
             // mode is set to 1, and there's no existing locked-on player, the totaldmg of FOF is still the baseline
-            if (data.MODE() == 1
+            if (Event.getTarget() instanceof LivingEntity livingEntity
+                    && data.MODE() == 1
                     && data.targetedplayer().isEmpty()
-                    && data.totaldmg() == 0) {
+                    && data.totaldmg() == 0
+                    && data.CoolDownEndTick() <= player.level().getGameTime()) {
                 //set the timer
                 long timeLeft = player.level().getGameTime() + 600L;
                 FirthOfFifthsData update = new FirthOfFifthsData(
@@ -50,9 +52,7 @@ public class ModEvents {
                         data.isUpgraded()
                 );
                 //applying the glow effect, this can and SHOULD be changed in the future for particle animations
-                if (Event.getTarget() instanceof LivingEntity livingEntity){
-                    livingEntity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 600, 0, false, true));
-                }
+                livingEntity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 600, 0, false, true));
                 //actually updating the item
                 player.getMainHandItem().set(ModDataComponents.FIRTH_DATA.get(), update);
                 //cancel the attack
@@ -72,7 +72,7 @@ public class ModEvents {
 
     //this will need a little rework, mainly on the code structure
     @SubscribeEvent
-    public static void onTargetAttackedFOF(LivingDamageEvent.Post Event){
+    public static void onTargetAttackedFOF_ForRecord(LivingDamageEvent.Post Event){
         //check the thing that got attacked
         LivingEntity damagedEntity = Event.getEntity();
         //check if it's on server side
@@ -163,7 +163,7 @@ public class ModEvents {
             if (player.getMainHandItem().getItem() instanceof FirthOfFifthsItems FOF){
                 FirthOfFifthsData data = FOF.getData(player.getMainHandItem());
                 //is the timer = 0 and dmg > 0???
-                if(data.TimeLeft() == 0 && data.totaldmg() > 0){
+                if(data.TimeLeft() <= player.level().getGameTime() && data.totaldmg() > 0){
                     //set the damage done to the entity equal to the damage recorded in FOF
                     event.setAmount(data.totaldmg());
                     //set the coolDown
@@ -173,7 +173,7 @@ public class ModEvents {
                             data.MODE(),
                             Optional.empty(),
                             0.0F,
-                            0L,
+                            player.level().getGameTime(),
                             coolDown,
                             data.isUpgraded()
                     );
